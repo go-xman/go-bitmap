@@ -111,43 +111,6 @@ func TestGetSet(t *testing.T) {
 	}
 }
 
-func TestConcurrent(t *testing.T) {
-	bm := NewConcurrent(10)
-	if len(bm) != 2 || cap(bm) != 5 || bm.Len() != 16 {
-		t.Fatal("wrong length")
-	}
-	bm.Set(3, true)
-	data := bm.Data(true)
-	if Get(data, 3) != true {
-		t.Fatal("wrong data copy")
-	}
-}
-
-func TestConcurrentGet(t *testing.T) {
-	bm := NewConcurrent(10)
-
-	Set(bm, 4, true)
-	if bm.Get(4) != true {
-		t.Fatal("wrong get")
-	}
-
-}
-
-func TestConcurrentSet(t *testing.T) {
-	bm := NewConcurrent(10)
-
-	bm.Set(4, true)
-	if !Get(bm, 4) {
-		t.Fatal("should be true")
-	}
-	bm.Set(4, true)
-	bm.Set(4, false)
-	if Get(bm, 4) {
-		t.Fatal("should be false")
-	}
-
-}
-
 func BenchmarkFuncs(b *testing.B) {
 	bm := New(1000 * 1000)
 	index := 0

@@ -141,7 +141,7 @@ func (b *Threadsafe) Data(copy bool) []byte {
 }
 
 // Len wraps around the Len function.
-func (b Threadsafe) Len() int {
+func (b *Threadsafe) Len() int {
 	b.mu.RLock()
 	l := b.bm.Len()
 	b.mu.RUnlock()
@@ -149,7 +149,7 @@ func (b Threadsafe) Len() int {
 }
 
 // Get wraps around the Get function.
-func (b Threadsafe) Get(i int) bool {
+func (b *Threadsafe) Get(i int) bool {
 	b.mu.RLock()
 	v := b.bm.Get(i)
 	b.mu.RUnlock()
@@ -157,44 +157,8 @@ func (b Threadsafe) Get(i int) bool {
 }
 
 // Set wraps around the Set function.
-func (b Threadsafe) Set(i int, v bool) {
+func (b *Threadsafe) Set(i int, v bool) {
 	b.mu.Lock()
 	b.bm.Set(i, v)
 	b.mu.Unlock()
-}
-
-// Concurrent is a bitmap implementation that achieves thread-safety
-// using atomic operations along with some unsafe.
-// It performs atomic operations on 32bits of data.
-type Concurrent []byte
-
-// NewConcurrent returns a concurrent bitmap.
-// It will create a bitmap
-func NewConcurrent(l int) Concurrent {
-	remainder := l % 8
-	if remainder != 0 {
-		remainder = 1
-	}
-	return make([]byte, l/8+remainder, l/8+remainder+3)
-}
-
-// Get wraps around the Get function.
-func (c Concurrent) Get(b int) bool {
-	return Get(c, b)
-}
-
-// Set wraps around the SetAtomic function.
-func (c Concurrent) Set(b int, v bool) {
-	SetAtomic(c, b, v)
-}
-
-// Len wraps around the Len function.
-func (c Concurrent) Len() int {
-	return Len(c)
-}
-
-// Data returns the data of the bitmap.
-// If copy is false the actual underlying slice will be returned.
-func (c Concurrent) Data(copy bool) []byte {
-	return dataOrCopy(c, copy)
 }
